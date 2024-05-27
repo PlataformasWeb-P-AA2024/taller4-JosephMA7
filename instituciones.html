@@ -1,102 +1,103 @@
-<!DOCTYPE html>
+DOCTYPE html>
 <html>
-
-<head>
+  <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <title>Demo jQuery - jQueryUI - CouchDB</title>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" type="estilos/estilos.css" href="text/css">
     <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    <link rel="stylesheet" href="estilos.css">
-</head>
-
-<body>
-
-    <h3>Ejemplo de Uso de Jquery + CouchDB</h3>
-    <div id="pestanias">
+  </head>
+  <body>
+    
+      <h3>Ejemplo de Uso de Jquery + CouchDB</h3>
+      <div id="pestanias">
         <ul>
-            <li><a href="#t1">Principal</a></li>
+          <li><a href="t1">Principal</a></li>
+          <li><a href="#t2">Buscar por Cantón</a></li>
+          <li><a href="#t3">Buscar por Límite</a></li>
         </ul>
         <div id="t1">
-            <table id="tabla-info">
-                <thead>
-                    <tr>
-                        <th>Nombre de la Institución</th>
-                        <th>Provincia</th>
-                        <th>Cantón</th>
-                        <th>Zona Administrativa</th>
-                    </tr>
-                </thead>
-                <tbody id="datos-tabla">
-                    <!-- Aquí se mostrará la información obtenida -->
-                </tbody>
-            </table>
-            <br>
-            <button id="all-info">Toda la informacion</button>
-            <br><br>
-            <label for="canton">Cantón:</label>
-            <input type="text" id="canton">
-            <button id="buscar-canton">Buscar por cantón</button>
-            <br><br>
-            <label for="limite">Límite:</label>
-            <input type="text" id="limite">
-            <button id="buscar-limite">Buscar por límite</button>
+          <p id="mensajeFinal"></p>
+          <button type="submit" id="all">All informacion</button>
         </div>
-    </div>
-</body>
-<script>
-    $(document).ready(function () {
-        $("#pestanias").tabs();
 
-        // Función para cargar la información de la vista en una tabla HTML
-        function cargarInformacion(data) {
-            var tableRows = "";
-            data.forEach(function (row) {
-                tableRows += "<tr>";
-                tableRows += "<td>" + row.Nombre_Institucion + "</td>";
-                tableRows += "<td>" + row.Provincia + "</td>";
-                tableRows += "<td>" + row.Canton + "</td>";
-                tableRows += "<td>" + row.Zona_Administrativa + "</td>";
-                tableRows += "</tr>";
-            });
-            $("#datos-tabla").html(tableRows);
-        }
+        <div id ="t2">
+          <p id="mensajeFinal2"> </p>
+          <input type = "text" name="busquedaCanton" id="busquedaCanton">
+          <button type="submit" id="buscarCantonButton">Buscar por Cantón</button>
+        </div>
 
-        // Botón "Obtener toda la información"
-        $("#all-info").click(function () {
-            var canton = $("#canton").val();
-            $.ajax({
-                dataType: 'json',
-                url: "http://127.0.0.1:5984/instituciones/_design/vista001/_view/vista001?include_docs=true"
-            }).then(function (data) {
-                cargarInformacion(data.rows.map(function (row) { return row.doc; }));
-            });
-        });
+        <div id="t3">
+          <p id="mensajeFinal3"></p>
+          <input type="text" name="limite" id="limite">
+          <button id="buscarLimiteButton">Buscar por Límite</button>
+        </div>
 
+      </div>
+  </body>
+  <script>
+    $(document).ready(function() {
 
-        // Botón "Buscar por cantón"
-        $("#buscar-canton").click(function () {
-            var canton = $("#canton").val();
-            $.ajax({
-                dataType: 'json',
-                url: "http://127.0.0.1:5984/instituciones/_design/vista001/_view/vista001?include_docs=true&key=\"" + canton + "\"&endkey=\"" + canton + "\\ufff0\""
-            }).then(function (data) {
-                cargarInformacion(data.rows.map(function (row) { return row.doc; }));
-            });
-        });
+      $("#pestanias").tabs();
+      $( "#all" ).click(function() {
+        $.ajax({
+              dataType: 'json',
+              url: "http://127.0.0.1:5984/instituciones/_all_docs?&include_docs=true"
+              }).then(function(data) {
+                console.log(data);
+                $('#mensajeFinal').append("<table> <tr><th>AMIE:</th> <th>Nombre INstitucion: </th><th>Provincia </th> <th>Cantón:</th></tr>");
+                for(var i=0; i<data.rows.length; i++){
+                  var amie = data.rows[i].doc.AMIE;
+                  var nomInst = data.rows[i].doc.Nombre_Institucion;
+                  var provincia = data.rows[i].doc.Provincia;
+                  var canton = data.rows[i].doc.Canton;
+                  $('#mensajeFinal table').append("<tr><td>"+ amie +"</td><td>"+ nomInst +"</td><td>"+ provincia +"</td><td>"+ canton +"</td>");
+                }
+                $('#mensajeFinal').append("</table>")
+              });
+      });
+      
+      $( "#buscarCantonButton" ).click(function() {
+        var busqueda = $("#busquedaCanton").val();
+        $.ajax({
+              dataType: 'json',
+              url: 'http://127.0.0.1:5984/instituciones/_design/busca/_view/new-view?key="'+busqueda+'"&include_docs=true'
+              }).then(function(data) {
+                console.log(data);
+                $('#mensajeFinal2').append("<table> <tr><th>AMIE:</th> <th>Nombre INstitucion: </th><th>Provincia </th> <th>Cantón:</th></tr>");
+                for(var i=0; i<data.rows.length; i++){
+                  var amie = data.rows[i].doc.AMIE;
+                  var nomInst = data.rows[i].doc.Nombre_Institucion;
+                  var provincia = data.rows[i].doc.Provincia;
+                  var canton = data.rows[i].doc.Canton;
+                  $('#mensajeFinal2 table').append("<tr><td>"+ amie +"</td><td>"+ nomInst +"</td><td>"+ provincia +"</td><td>"+ canton +"</td>");
+                }
+                $('#mensajeFinal2').append("</table>")
+              });
+      });
 
-        // Botón "Buscar por límite"
-        $("#buscar-limite").click(function () {
-            var limite = parseInt($("#limite").val());
-            $.ajax({
-                dataType: 'json',
-                url: "http://127.0.0.1:5984/instituciones/_design/vista001/_view/vista001?include_docs=true&limit=" + limite
-            }).then(function (data) {
-                cargarInformacion(data.rows.map(function (row) { return row.doc; }));
-            });
-        });
+      $( "#buscarLimiteButton" ).click(function() {
+        var limite = $("#limite").val();
+        $.ajax({
+              dataType: 'json',
+              url: 'http://127.0.0.1:5984/instituciones/_all_docs?limit=' + limite + '&include_docs=true'
+              }).then(function(data) {
+                console.log(data);
+                $('#mensajeFinal3').empty().append("<table> <tr><th>AMIE:</th> <th>Nombre Institución: </th><th>Provincia </th> <th>Cantón:</th></tr>");
+                for(var i=0; i<data.rows.length; i++){
+                  var amie = data.rows[i].doc.AMIE;
+                  var nomInst = data.rows[i].doc.Nombre_Institucion;
+                  var provincia = data.rows[i].doc.Provincia;
+                  var canton = data.rows[i].doc.Canton;
+                  $('#mensajeFinal3 table').append("<tr><td>"+ amie +"</td><td>"+ nomInst +"</td><td>"+ provincia +"</td><td>"+ canton +"</td></tr>");
+                }
+                $('#mensajeFinal3').append("</table>")
+              });
+      });
+
     });
-</script>
 
+  </script>
 </html>
