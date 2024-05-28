@@ -44,7 +44,7 @@ DOCTYPE html>
       $( "#all" ).click(function() {
         $.ajax({
               dataType: 'json',
-              url: "http://127.0.0.1:5984/instituciones/_all_docs?&include_docs=true"
+              url: "http://127.0.0.1:5984/instituciones/_all_docs?include_docs=true"
               }).then(function(data) {
                 console.log(data);
                 $('#mensajeFinal').append("<table> <tr><th>AMIE:</th> <th>Nombre INstitucion: </th><th>Provincia </th> <th>Cantón:</th></tr>");
@@ -63,7 +63,7 @@ DOCTYPE html>
         var busqueda = $("#busquedaCanton").val();
         $.ajax({
               dataType: 'json',
-              url: 'http://127.0.0.1:5984/instituciones/_design/busca/_view/new-view?key="'+busqueda+'"&include_docs=true'
+              url: 'http://127.0.0.1:5984/instituciones/_design/busca/_view/_view?key="'+busqueda+'"&include_docs=true'
               }).then(function(data) {
                 console.log(data);
                 $('#mensajeFinal2').append("<table> <tr><th>AMIE:</th> <th>Nombre INstitucion: </th><th>Provincia </th> <th>Cantón:</th></tr>");
